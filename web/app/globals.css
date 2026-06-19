@@ -1,0 +1,40 @@
+@import url("https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  direction: rtl;
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-cream text-ink antialiased;
+  font-family: "Vazirmatn", system-ui, sans-serif;
+}
+
+@layer components {
+  /* قاب منحنیِ ارگانیک دور تصویر */
+  .blob-frame {
+    border-radius: 42% 58% 57% 43% / 45% 42% 58% 55%;
+  }
+  .blob-frame-2 {
+    border-radius: 58% 42% 38% 62% / 52% 56% 44% 48%;
+  }
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-gold px-7 py-3.5 font-bold text-white shadow-soft transition hover:bg-gold-dark;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-ink/20 bg-white/60 px-7 py-3.5 font-bold text-ink transition hover:bg-white;
+  }
+  .card {
+    @apply rounded-3xl border border-ink/5 bg-white/70 shadow-soft backdrop-blur;
+  }
+}
+
+/* الگوی نقطه‌چین تزئینی */
+.dot-grid {
+  background-image: radial-gradient(rgba(201, 150, 46, 0.28) 1.4px, transparent 1.4px);
+  background-size: 16px 16px;
+}
