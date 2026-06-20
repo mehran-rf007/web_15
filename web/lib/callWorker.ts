@@ -29,15 +29,33 @@ export async function callWorker(payload: WorkerRequest): Promise<WorkerResponse
     .update(`${timestamp}.${body}`)
     .digest("hex");
 
-  const res = await fetch(`${process.env.WORKER_URL}/generate`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-timestamp": timestamp,
-      "x-signature": signature,
-    },
-    body,
-  });
+  // تایم‌اوت مشخص تا در صورت کند بودن Worker، به‌جای آویزان ماندن، خطای خوانا بدهد.
+  const controller = new AbortController();
+  const timeoutMs = Number(process.env.WORKER_TIMEOUT_MS ?? 170000);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  let res: Response;
+  try {
+    res = await fetch(`${process.env.WORKER_URL}/generate`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-timestamp": timestamp,
+        "x-signature": signature,
+      },
+      body,
+      signal: controller.signal,
+    });
+  } catch (err: any) {
+    if (err?.name === "AbortError") {
+      throw new Error(
+        `زمان پاسخ‌گویی Worker بیش از ${Math.round(timeoutMs / 1000)} ثانیه شد (تایم‌اوت). نسخه‌ی پرو زمان‌برتر است؛ دوباره تلاش کن یا پلن Worker را ارتقا بده.`,
+      );
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 
   if (!res.ok) {
     const text = await res.text();

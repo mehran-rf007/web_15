@@ -142,6 +142,26 @@ export async function POST(req: NextRequest) {
       error: err.message,
       latency_ms: Date.now() - startedAt,
     });
+    // ثبت خطای کامل برای دیباگ بهتر در Supabase ← جدول error_logs
+    try {
+      await supabase.from("error_logs").insert({
+        scope: "generate",
+        user_id: user.id,
+        image_id: imageId,
+        message: err?.message ?? String(err),
+        detail: {
+          quality: body.quality,
+          style: body.style,
+          category: body.category,
+          hasModel: Boolean(modelImageBase64),
+          hasBackground: Boolean(body.backgroundImageBase64),
+          latency_ms: Date.now() - startedAt,
+          stack: err?.stack ?? null,
+        },
+      });
+    } catch {
+      // اگر جدول error_logs هنوز ساخته نشده باشد، مسیر اصلی نباید بشکند.
+    }
     return NextResponse.json(
       {
         error: "تولید ناموفق بود؛ کردیت بازگردانده شد",

@@ -159,7 +159,13 @@ export default function StudioPage() {
         );
       setResult(`data:image/png;base64,${data.imageBase64}`);
     } catch (e: any) {
-      setError(e.message);
+      const isNetwork =
+        e?.message === "Failed to fetch" || e?.name === "TypeError";
+      setError(
+        isNetwork
+          ? "ارتباط با سرور قطع شد. پردازش (به‌خصوص نسخه‌ی پرو) ممکن است زمان‌بر باشد یا سرور در حال بیدار شدن باشد. چند لحظه صبر کن و دوباره تلاش کن."
+          : e?.message || "خطا در تولید",
+      );
     } finally {
       setBusy(false);
     }
